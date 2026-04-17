@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>测一测你的本命香 · PocketNature</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --c-bg: #FAFAF8;
+    --c-surface: #FFFFFF;
+    --c-text: #1A1A18;
+    --c-text-2: #6B6B65;
+    --c-text-3: #A8A8A0;
+    --c-border: rgba(26,26,24,0.1);
+    --c-border-2: rgba(26,26,24,0.2);
+    --c-accent: #1A1A18;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--c-bg);
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    color: var(--c-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── 顶部进度 ── */
+  .top-bar {
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+  }
+  .brand {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--c-text-3);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .progress-track {
+    height: 2px;
+    background: var(--c-border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--c-text);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  /* ── 问题区 ── */
+  .quiz-body {
+    flex: 1;
+    padding: 32px 24px 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .step { display: none; flex-direction: column; flex: 1; }
+  .step.active { display: flex; }
+
+  .q-num {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--c-text-3);
+    margin-bottom: 12px;
+  }
+  .q-text {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--c-text);
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .q-sub {
+    font-size: 14px;
+    color: var(--c-text-3);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    background: var(--c-surface);
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .opt:active { transform: scale(0.985); }
+  .opt.selected {
+    border-color: var(--c-accent);
+    background: var(--c-surface);
+  }
+
+  .opt-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-border-2);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .opt.selected .opt-radio {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+  .opt.selected .opt-radio::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: white;
+    display: block;
+  }
+
+  .opt-body {}
+  .opt-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--c-text);
+    line-height: 1.4;
+    margin-bottom: 3px;
+  }
+  .opt-desc {
+    font-size: 13px;
+    color: var(--c-text-2);
+    line-height: 1.5;
+  }
+
+  /* ── 底部按钮 ── */
+  .nav {
+    margin-top: 24px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn-back {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 18px;
+    color: var(--c-text-2);
+    transition: background 0.15s;
+  }
+  .btn-back:active { background: var(--c-border); }
+  .btn-next {
+    flex: 1;
+    height: 52px;
+    border-radius: var(--radius-lg);
+    border: none;
+    background: var(--c-accent);
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-next:active { transform: scale(0.98); }
+  .btn-next:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+  .btn-next:disabled:active { transform: none; }
+
+  /* ── 结果页 ── */
+  #resultWrap {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  #resultWrap.show { display: flex; }
+
+  .result-hero {
+    padding: 48px 24px 36px;
+    text-align: center;
+    background: var(--c-surface);
+    border-bottom: 1px solid var(--c-border);
+  }
+  .result-brand {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--c-text-3);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .result-icon { font-size: 52px; margin-bottom: 16px; line-height: 1; }
+  .result-tag-label {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--c-text-3);
+    margin-bottom: 6px;
+  }
+  .result-name {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--c-text);
+    margin-bottom: 4px;
+  }
+  .result-en {
+    font-size: 13px;
+    color: var(--c-text-3);
+    margin-bottom: 24px;
+    letter-spacing: 0.04em;
+  }
+  .result-quote {
+    font-size: 14px;
+    color: var(--c-text-2);
+    line-height: 1.8;
+    max-width: 300px;
+    margin: 0 auto;
+    font-style: italic;
+    position: relative;
+    padding: 0 8px;
+  }
+
+  .result-body {
+    padding: 28px 24px;
+    flex: 1;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--c-text-3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .result-desc {
+    font-size: 15px;
+    color: var(--c-text-2);
+    line-height: 1.85;
+    margin-bottom: 24px;
+  }
+
+  .traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .trait {
+    font-size: 13px;
+    color: var(--c-text-2);
+    padding: 6px 14px;
+    border: 1px solid var(--c-border);
+    border-radius: 20px;
+    background: var(--c-surface);
+  }
+
+  .cta-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-2);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .cta-card:active { background: var(--c-bg); }
+  .cta-sublabel { font-size: 11px; color: var(--c-text-3); margin-bottom: 4px; letter-spacing: 0.04em; }
+  .cta-title { font-size: 16px; font-weight: 600; color: var(--c-text); margin-bottom: 3px; }
+  .cta-sub { font-size: 12px; color: var(--c-text-3); }
+  .cta-arrow { font-size: 20px; color: var(--c-text-3); }
+
+  .retry {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    font-size: 14px;
+    color: var(--c-text-3);
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s;
+  }
+  .retry:active { background: var(--c-border); }
+
+  .share-hint {
+    text-align: center;
+    font-size: 12px;
+    color: var(--c-text-3);
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- 测试区 -->
+<div class="wrap" id="quizWrap">
+  <div class="top-bar">
+    <div class="brand">PocketNature · 本命香测试</div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="quiz-body">
+
+    <!-- Q1 -->
+    <div class="step active" data-q="0">
+      <div class="q-num">01 / 06</div>
+      <div class="q-text">闭上眼睛，最让你感到安心的一个气味画面是——</div>
+      <div class="q-sub">别想太久，跟直觉走</div>
+      <div class="options">
+        <div class="opt" data-score="sweet">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">阳台上晒暖的橘子皮</div><div class="opt-desc">冬日午后，阳光把果香烤进空气里</div></div>
+        </div>
+        <div class="opt" data-score="lavender">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">雨后大片紫色花田</div><div class="opt-desc">空气湿润，带着泥土和花穗的气息</div></div>
+        </div>
+        <div class="opt" data-score="lemon">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">刚切开的柠檬，汁水溅出来</div><div class="opt-desc">那一瞬间的酸、亮、清</div></div>
+        </div>
+        <div class="opt" data-score="mint">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">深夜开窗，山里来的凉风</div><div class="opt-desc">带着草本气息，让人一下子清醒</div></div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn-next" id="btn0" onclick="next(0)" disabled>继续</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="step" data-q="1">
+      <div class="q-num">02 / 06</div>
+      <div class="q-text">此刻你的身体，更接近哪种状态？</div>
+      <div class="q-sub">身体知道答案，不用理性判断</div>
+      <div class="options">
+        <div class="opt" data-score="sweet">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">有点低落，想被温柔包裹</div><div class="opt-desc">需要一点甜，一点暖</div></div>
+        </div>
+        <div class="opt" data-score="lavender">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">绷了很久，想彻底放松</div><div class="opt-desc">肩膀沉，脑子停不下来</div></div>
+        </div>
+        <div class="opt" data-score="lemon">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">有点混沌，想要清晰</div><div class="opt-desc">思绪乱，需要一个清醒的锚点</div></div>
+        </div>
+        <div class="opt" data-score="mint">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">疲惫但还有事要做</div><div class="opt-desc">需要一口气，快速重启</div></div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="prev(1)">←</button>
+        <button class="btn-next" id="btn1" onclick="next(1)" disabled>继续</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="step" data-q="2">
+      <div class="q-num">03 / 06</div>
+      <div class="q-text">最近你的内心底色更像——</div>
+      <div class="q-sub">不评判，选最接近的那个</div>
+      <div class="options">
+        <div class="opt" data-score="sweet">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">想被好好对待</div><div class="opt-desc">有些委屈没说出口，渴望温柔</div></div>
+        </div>
+        <div class="opt" data-score="lavender">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">想找回内心的平静</div><div class="opt-desc">外部太吵，想安静地待一会儿</div></div>
+        </div>
+        <div class="opt" data-score="lemon">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">想重新充满能量</div><div class="opt-desc">感觉有什么没被激活，等待一个触发点</div></div>
+        </div>
+        <div class="opt" data-score="mint">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">想把脑子清空重来</div><div class="opt-desc">太多事情堆着，需要一次重置</div></div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="prev(2)">←</button>
+        <button class="btn-next" id="btn2" onclick="next(2)" disabled>继续</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="step" data-q="3">
+      <div class="q-num">04 / 06</div>
+      <div class="q-text">如果可以消失一下午，你最想去——</div>
+      <div class="q-sub">不考虑现实，只跟着向往走</div>
+      <div class="options">
+        <div class="opt" data-score="sweet">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">朋友家的暖和客厅</div><div class="opt-desc">窝在沙发里，什么都不用说</div></div>
+        </div>
+        <div class="opt" data-score="lavender">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">郊外某处的大草地</div><div class="opt-desc">躺着，看云，不想任何事</div></div>
+        </div>
+        <div class="opt" data-score="lemon">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">阳光好的咖啡馆角落</div><div class="opt-desc">带本书，或者什么都不做，就晒着</div></div>
+        </div>
+        <div class="opt" data-score="mint">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">海边或山顶，风大的地方</div><div class="opt-desc">需要那种被吹透的感觉</div></div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="prev(3)">←</button>
+        <button class="btn-next" id="btn3" onclick="next(3)" disabled>继续</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="step" data-q="4">
+      <div class="q-num">05 / 06</div>
+      <div class="q-text">你最有自己感觉的时刻是——</div>
+      <div class="q-sub">那种「对，这就是我」的瞬间</div>
+      <div class="options">
+        <div class="opt" data-score="sweet">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">把一件小事做得特别用心</div><div class="opt-desc">送礼、布置、给朋友写了很长一条消息</div></div>
+        </div>
+        <div class="opt" data-score="lavender">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">一个人在安静的空间里</div><div class="opt-desc">不用照顾任何人，时间是自己的</div></div>
+        </div>
+        <div class="opt" data-score="lemon">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">突然想通了某件事</div><div class="opt-desc">清晰、利落，思路一下子通了</div></div>
+        </div>
+        <div class="opt" data-score="mint">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">运动或劳动后大汗淋漓</div><div class="opt-desc">身体被用到极限，反而很踏实</div></div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="prev(4)">←</button>
+        <button class="btn-next" id="btn4" onclick="next(4)" disabled>继续</button>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="step" data-q="5">
+      <div class="q-num">06 / 06</div>
+      <div class="q-text">直觉选一个：你现在最缺的是——</div>
+      <div class="q-sub">最后一题，选完立刻出结果</div>
+      <div class="options">
+        <div class="opt" data-score="sweet">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">被接纳的温暖</div><div class="opt-desc">有人懂你，你不用解释</div></div>
+        </div>
+        <div class="opt" data-score="lavender">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">深度的休息</div><div class="opt-desc">不是睡觉，是灵魂层面的放松</div></div>
+        </div>
+        <div class="opt" data-score="lemon">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">一个清醒的开始</div><div class="opt-desc">重新出发，不拖了</div></div>
+        </div>
+        <div class="opt" data-score="mint">
+          <div class="opt-radio"></div>
+          <div class="opt-body"><div class="opt-title">突破边界的勇气</div><div class="opt-desc">想做的事一直没动，今天想冲</div></div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="prev(5)">←</button>
+        <button class="btn-next" id="btn5" onclick="showResult()" disabled>查看我的本命香 →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 结果页 -->
+<div id="resultWrap">
+  <div style="padding: 0 0 40px;">
+    <div class="result-hero">
+      <div class="result-brand">PocketNature · 你的本命香</div>
+      <div class="result-icon" id="resIcon"></div>
+      <div class="result-tag-label">你的本命香是</div>
+      <div class="result-name" id="resName"></div>
+      <div class="result-en" id="resEn"></div>
+      <div class="result-quote" id="resQuote"></div>
+    </div>
+    <div class="result-body">
+      <div class="section-label">为什么是你的香</div>
+      <div class="result-desc" id="resDesc"></div>
+      <div class="traits" id="resTraits"></div>
+      <div class="section-label" style="margin-bottom:12px">你的专属精油</div>
+      <div class="cta-card">
+        <div>
+          <div class="cta-sublabel">PocketNature 天然精油</div>
+          <div class="cta-title" id="ctaTitle"></div>
+          <div class="cta-sub">原产地直采 · 封闭系统专属</div>
+        </div>
+        <div class="cta-arrow">→</div>
+      </div>
+      <button class="retry" onclick="retry()">重新测一次</button>
+      <div class="share-hint">长按截图，分享给朋友测一测</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const RESULTS = {
+  sweet: {
+    icon: '🍊',
+    name: '暖意橙光',
+    en: 'Sweet Orange · 西班牙原产地',
+    quote: '「你不是不够强，你只是太久没被好好对待了。橙的甜，替你说那句还没说出口的话。」',
+    desc: '你有一颗很柔软的心，愿意为身边的人用力，却常常忘记给自己一点甜。甜橙精油来自西班牙阳光照足的橙园，果皮冷压萃取，暖甜的气息能在你疲惫时包裹住你，像一个不需要解释的拥抱。',
+    traits: ['善于照顾他人', '容易共情', '需要被温柔对待', '重视仪式感'],
+    cta: '甜橙精油 · 冷压萃取'
+  },
+  lavender: {
+    icon: '🌿',
+    name: '山野息声',
+    en: 'Lavender · 普罗旺斯原产地',
+    quote: '「你不是累了，你是太久没有真正停下来。把这口气吸进去，世界可以等一下。」',
+    desc: '你的神经一直在高速运转，对外界高度敏感，承接了太多人的情绪。薰衣草精油来自普罗旺斯高海拔产区，蒸馏自整株鲜花，那种沉静的草本气息，是让你从「照顾模式」切换回「自己模式」的开关。',
+    traits: ['高度敏感', '需要独处充电', '渴望真正的休息', '直觉很准'],
+    cta: '薰衣草精油 · 蒸汽蒸馏'
+  },
+  lemon: {
+    icon: '🍋',
+    name: '清醒时刻',
+    en: 'Lemon · 西西里岛原产地',
+    quote: '「混沌不是你的常态，你本来就是那个看得清的人。柠檬替你把思路的雾散开。」',
+    desc: '你有清晰的内核，只是最近被太多事情糊住了。柠檬精油来自西西里岛阳光最饱满的地方，冷压果皮得到那股子明亮的酸香——不是刺激，是唤醒。像一杯水泼在脸上，思路重新清晰起来。',
+    traits: ['逻辑清晰', '追求效率', '容易被杂事困住', '需要外部信号来重启'],
+    cta: '柠檬精油 · 冷压萃取'
+  },
+  mint: {
+    icon: '❄️',
+    name: '破风入境',
+    en: 'Peppermint · 云南原产地',
+    quote: '「你早就准备好了。差的不是能力，是那口冲破边界的气。吸一口，动起来。」',
+    desc: '你是那种行动力埋在深处的人，一旦启动就停不下来，但启动需要一个触发器。薄荷精油来自云南高原，那股穿透感不是刺激，是释放——帮你瞬间突破那层「还没准备好」的壳，推你往前走一步。',
+    traits: ['行动派底色', '需要启动信号', '边界感清晰', '喜欢真实的感受'],
+    cta: '薄荷精油 · 蒸汽蒸馏'
+  }
+};
+
+const scores = { sweet: 0, lavender: 0, lemon: 0, mint: 0 };
+const answers = {};
+let current = 0;
+
+function updateProgress() {
+  document.getElementById('progressFill').style.width = ((current / 6) * 100) + '%';
+}
+
+document.querySelectorAll('.step').forEach((step, qi) => {
+  step.querySelectorAll('.opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const prev = answers[qi];
+      if (prev) scores[prev]--;
+      step.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      answers[qi] = opt.dataset.score;
+      scores[opt.dataset.score]++;
+      document.getElementById('btn' + qi).disabled = false;
+    });
+  });
+});
+
+function next(qi) {
+  if (!answers[qi]) return;
+  document.querySelector('.step[data-q="' + qi + '"]').classList.remove('active');
+  current = qi + 1;
+  document.querySelector('.step[data-q="' + current + '"]').classList.add('active');
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+
+function prev(qi) {
+  document.querySelector('.step[data-q="' + qi + '"]').classList.remove('active');
+  current = qi - 1;
+  document.querySelector('.step[data-q="' + current + '"]').classList.add('active');
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+
+function showResult() {
+  const winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+  const r = RESULTS[winner];
+  document.getElementById('resIcon').textContent = r.icon;
+  document.getElementById('resName').textContent = r.name;
+  document.getElementById('resEn').textContent = r.en;
+  document.getElementById('resQuote').textContent = r.quote;
+  document.getElementById('resDesc').textContent = r.desc;
+  document.getElementById('ctaTitle').textContent = r.cta;
+  document.getElementById('resTraits').innerHTML = r.traits.map(t => '<span class="trait">' + t + '</span>').join('');
+  document.getElementById('quizWrap').style.display = 'none';
+  document.getElementById('resultWrap').classList.add('show');
+  document.getElementById('progressFill').style.width = '100%';
+  window.scrollTo(0, 0);
+}
+
+function retry() {
+  Object.keys(scores).forEach(k => scores[k] = 0);
+  Object.keys(answers).forEach(k => delete answers[k]);
+  current = 0;
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  for (let i = 0; i < 6; i++) {
+    const btn = document.getElementById('btn' + i);
+    if (btn) btn.disabled = true;
+  }
+  document.getElementById('quizWrap').style.display = 'flex';
+  document.getElementById('resultWrap').classList.remove('show');
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.querySelector('.step[data-q="0"]').classList.add('active');
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
