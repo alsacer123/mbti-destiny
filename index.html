@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MBTI 本命香 · PocketNature</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--t:#1A1A18;--t2:#6B6B65;--t3:#A8A8A0;--bg:#FAFAF8;--sur:#fff;--bd:rgba(26,26,24,0.1);--bd2:rgba(26,26,24,0.22);--r:14px}
+html,body{background:var(--bg);font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;color:var(--t);-webkit-font-smoothing:antialiased}
+
+.wrap{max-width:420px;margin:0 auto;padding:28px 20px 60px}
+.brand{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:14px}
+.prog-track{height:2px;background:var(--bd);border-radius:2px;overflow:hidden;margin-bottom:32px}
+.prog-fill{height:100%;background:var(--t);border-radius:2px;transition:width .4s ease}
+
+.step{display:none}
+.step.active{display:block}
+
+.qnum{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:10px}
+.qtxt{font-size:20px;font-weight:600;line-height:1.4;letter-spacing:-.3px;margin-bottom:5px;color:var(--t)}
+.qsub{font-size:13px;color:var(--t3);margin-bottom:22px}
+
+.opts{display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.opt{display:flex;align-items:flex-start;gap:13px;padding:15px;border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;background:var(--sur);transition:border-color .12s;-webkit-user-select:none;user-select:none}
+.opt:active{transform:scale(.985)}
+.opt.sel{border:1.5px solid var(--t)}
+.dot{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--bd2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.opt.sel .dot{background:var(--t);border-color:var(--t)}
+.opt.sel .dot::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;display:block}
+.opt-main{font-size:15px;font-weight:500;color:var(--t);line-height:1.4;margin-bottom:3px}
+.opt-tag{font-size:12px;color:var(--t3)}
+
+.nav{display:flex;gap:8px;align-items:center}
+.btn-back{width:46px;height:46px;border-radius:50%;border:1px solid var(--bd);background:var(--sur);font-size:17px;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-back:active{background:var(--bd)}
+.btn-next{flex:1;height:50px;border-radius:var(--r);border:none;background:var(--t);color:#fff;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.02em;transition:opacity .15s,transform .1s}
+.btn-next:active{transform:scale(.98)}
+.btn-next:disabled{opacity:.22;cursor:default}
+.btn-next:disabled:active{transform:none}
+
+/* 结果页 */
+.result{display:none;max-width:420px;margin:0 auto;padding:40px 20px 60px}
+.result.show{display:block}
+.res-eyebrow{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:8px}
+.res-icon{font-size:48px;margin-bottom:12px;line-height:1}
+.res-name{font-size:28px;font-weight:700;letter-spacing:-.4px;color:var(--t);margin-bottom:3px}
+.res-en{font-size:12px;color:var(--t3);letter-spacing:.04em;margin-bottom:14px}
+.mbti-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border:1px solid var(--bd2);border-radius:20px;margin-bottom:18px}
+.mbti-type{font-size:17px;font-weight:600;color:var(--t)}
+.mbti-sub{font-size:12px;color:var(--t2)}
+.res-quote{font-size:14px;color:var(--t2);line-height:1.8;font-style:italic;margin-bottom:24px;padding:14px 16px;border-left:2px solid var(--bd2)}
+.divider{height:.5px;background:var(--bd);margin:4px 0 24px}
+.slabel{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:9px}
+.res-desc{font-size:15px;color:var(--t2);line-height:1.8;margin-bottom:8px}
+.mbti-note{font-size:13px;color:var(--t3);line-height:1.7;margin-bottom:24px}
+.letters-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.lpill{font-size:12px;padding:5px 13px;border:1px solid var(--bd);border-radius:16px;color:var(--t2)}
+.lpill.hi{border-color:var(--t);color:var(--t);font-weight:500}
+.scent-card{border:1px solid var(--bd2);border-radius:var(--r);padding:17px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;background:var(--sur)}
+.sc-sub{font-size:11px;color:var(--t3);margin-bottom:3px;letter-spacing:.04em}
+.sc-title{font-size:15px;font-weight:600;color:var(--t);margin-bottom:3px}
+.sc-tag{font-size:12px;color:var(--t3)}
+.retry{width:100%;padding:13px;border:1px solid var(--bd);border-radius:10px;background:transparent;font-size:13px;color:var(--t3);cursor:pointer;margin-top:4px}
+.retry:active{background:var(--bd)}
+.hint{text-align:center;font-size:12px;color:var(--t3);margin-top:13px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="quizWrap">
+  <div class="brand">POCKETNATURE · MBTI 本命香</div>
+  <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+
+  <div class="step active" id="s0">
+    <div class="qnum">01 / 04</div>
+    <div class="qtxt">周末结束，你更需要哪种方式恢复状态？</div>
+    <div class="qsub">选最接近你真实反应的那个</div>
+    <div class="opts" id="opts0">
+      <div class="opt" data-v="E">
+        <div class="dot"></div>
+        <div><div class="opt-main">约朋友出去，人多让我充电</div><div class="opt-tag">（E · 外向）</div></div>
+      </div>
+      <div class="opt" data-v="I">
+        <div class="dot"></div>
+        <div><div class="opt-main">一个人待着，安静才能恢复</div><div class="opt-tag">（I · 内向）</div></div>
+      </div>
+    </div>
+    <div class="nav"><button class="btn-next" id="n0" disabled>继续</button></div>
+  </div>
+
+  <div class="step" id="s1">
+    <div class="qnum">02 / 04</div>
+    <div class="qtxt">闻到一个好闻的气味，你第一反应是——</div>
+    <div class="qsub">直觉反应，不用分析</div>
+    <div class="opts" id="opts1">
+      <div class="opt" data-v="S">
+        <div class="dot"></div>
+        <div><div class="opt-main">这是什么味？在哪里闻过？</div><div class="opt-tag">（S · 实感）</div></div>
+      </div>
+      <div class="opt" data-v="N">
+        <div class="dot"></div>
+        <div><div class="opt-main">这个味道让我想到某个画面或感觉</div><div class="opt-tag">（N · 直觉）</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" id="b1">←</button>
+      <button class="btn-next" id="n1" disabled>继续</button>
+    </div>
+  </div>
+
+  <div class="step" id="s2">
+    <div class="qnum">03 / 04</div>
+    <div class="qtxt">朋友跟你说他最近很难，你会——</div>
+    <div class="qsub">不评判，选你实际会做的</div>
+    <div class="opts" id="opts2">
+      <div class="opt" data-v="T">
+        <div class="dot"></div>
+        <div><div class="opt-main">帮他分析问题出在哪里</div><div class="opt-tag">（T · 思考）</div></div>
+      </div>
+      <div class="opt" data-v="F">
+        <div class="dot"></div>
+        <div><div class="opt-main">先陪着他，让他说完</div><div class="opt-tag">（F · 情感）</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" id="b2">←</button>
+      <button class="btn-next" id="n2" disabled>继续</button>
+    </div>
+  </div>
+
+  <div class="step" id="s3">
+    <div class="qnum">04 / 04</div>
+    <div class="qtxt">你的包里 / 抽屉里更接近哪种？</div>
+    <div class="qsub">最后一题，选完立刻出结果</div>
+    <div class="opts" id="opts3">
+      <div class="opt" data-v="J">
+        <div class="dot"></div>
+        <div><div class="opt-main">东西各有其位，找东西不超过10秒</div><div class="opt-tag">（J · 判断）</div></div>
+      </div>
+      <div class="opt" data-v="P">
+        <div class="dot"></div>
+        <div><div class="opt-main">表面乱但我知道每样东西在哪</div><div class="opt-tag">（P · 感知）</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" id="b3">←</button>
+      <button class="btn-next" id="n3" disabled>查看我的本命香 →</button>
+    </div>
+  </div>
+</div>
+
+<div class="result" id="resultWrap">
+  <div class="res-eyebrow">你的本命香是</div>
+  <div class="res-icon" id="rIcon"></div>
+  <div class="res-name" id="rName"></div>
+  <div class="res-en" id="rEn"></div>
+  <div class="mbti-pill">
+    <span class="mbti-type" id="rType"></span>
+    <span class="mbti-sub" id="rTypeSub"></span>
+  </div>
+  <div class="res-quote" id="rQuote"></div>
+  <div class="divider"></div>
+  <div class="slabel">为什么是你的香</div>
+  <div class="res-desc" id="rDesc"></div>
+  <div class="mbti-note" id="rNote"></div>
+  <div class="slabel">你的 MBTI 维度</div>
+  <div class="letters-row" id="rLetters"></div>
+  <div class="slabel" style="margin-bottom:10px">你的专属精油</div>
+  <div class="scent-card">
+    <div>
+      <div class="sc-sub">PocketNature 天然精油</div>
+      <div class="sc-title" id="rCta"></div>
+      <div class="sc-tag">原产地直采 · 封闭系统专属</div>
+    </div>
+    <div style="font-size:18px;color:var(--t3)">→</div>
+  </div>
+  <button class="retry" id="retryBtn">重新测一次</button>
+  <div class="hint">长按截图，分享给朋友对比一下</div>
+</div>
+
+<script>
+var SCENTS = {
+  lavender: {icon:'🌿',name:'山野息声',en:'Lavender · 普罗旺斯原产地',quote:'「你从来不是真的平静，你只是学会了把风暴藏得很深。薰衣草懂你。」',desc:'NF型人格活在情感和意义的世界里，共情力惊人，却也容易被外界的噪声淹没。这种深度让你与众不同，也让你比别人更需要真正的休息。',note:'普罗旺斯高海拔薰衣草整株蒸馏，沉静的草本层次正好对应你需要的"灵魂充电"——不是睡觉，是真正的放下。',cta:'薰衣草精油 · 蒸汽蒸馏',group:'NF'},
+  lemon: {icon:'🍋',name:'清醒时刻',en:'Lemon · 西西里岛原产地',quote:'「你天生是看得透的人。柠檬的酸是宇宙给你的礼物——让你在一片模糊里保持清醒。」',desc:'NT型人格思维像精密仪器，最怕混沌和模糊。清晰是你的舒适区，也是你给自己和他人最大的礼物。',note:'西西里岛冷压柠檬，明亮的酸香一下穿透感官，帮你在思维过载时快速找回清醒的锚点。',cta:'柠檬精油 · 冷压萃取',group:'NT'},
+  mint: {icon:'❄️',name:'破风入境',en:'Peppermint · 云南原产地',quote:'「你早就准备好了。差的不是能力，是那口冲破边界的气。吸一口，动起来。」',desc:'SP型人格活在当下，身体感知极强，行动是你认识世界的方式。你不需要计划，你需要的是一个触发器，然后一切自然发生。',note:'云南高原薄荷，那股凉意不是刺激，是释放——对应你骨子里那股随时准备出发的劲儿。',cta:'薄荷精油 · 蒸汽蒸馏',group:'SP'},
+  sweet: {icon:'🍊',name:'暖意橙光',en:'Sweet Orange · 西班牙原产地',quote:'「你不是不够强，你只是太久没被好好对待了。橙的甜，替你说那句还没说出口的话。」',desc:'SJ型人格可靠、负责、照顾他人从不迟到。只是在照顾所有人之后，你有多久没好好照顾自己了？',note:'西班牙冷压甜橙，暖甜的气息像一个不需要解释的拥抱，提醒你：你也值得被温柔对待，而且是现在。',cta:'甜橙精油 · 冷压萃取',group:'SJ'}
+};
+var MBTI_SCENT = {NF:'lavender',NT:'lemon',SP:'mint',SJ:'sweet'};
+var LABELS = {E:'E 外向',I:'I 内向',S:'S 实感',N:'N 直觉',T:'T 思考',F:'F 情感',J:'J 判断',P:'P 感知'};
+var OPP = {E:'I',I:'E',S:'N',N:'S',T:'F',F:'T',J:'P',P:'J'};
+var ans = {};
+var cur = 0;
+
+// 绑定选项点击
+for (var q = 0; q < 4; q++) {
+  (function(qi) {
+    var opts = document.querySelectorAll('#opts' + qi + ' .opt');
+    opts.forEach(function(opt) {
+      opt.addEventListener('click', function() {
+        document.querySelectorAll('#opts' + qi + ' .opt').forEach(function(o){ o.classList.remove('sel'); });
+        this.classList.add('sel');
+        ans[qi] = this.getAttribute('data-v');
+        document.getElementById('n' + qi).disabled = false;
+      });
+    });
+  })(q);
+}
+
+// 绑定继续按钮
+document.getElementById('n0').addEventListener('click', function(){ goTo(0); });
+document.getElementById('n1').addEventListener('click', function(){ goTo(1); });
+document.getElementById('n2').addEventListener('click', function(){ goTo(2); });
+document.getElementById('n3').addEventListener('click', function(){ showResult(); });
+
+// 绑定返回按钮
+document.getElementById('b1').addEventListener('click', function(){ backTo(1); });
+document.getElementById('b2').addEventListener('click', function(){ backTo(2); });
+document.getElementById('b3').addEventListener('click', function(){ backTo(3); });
+
+// 重新测试
+document.getElementById('retryBtn').addEventListener('click', function(){ retry(); });
+
+function goTo(q) {
+  if (!ans[q]) return;
+  document.getElementById('s' + q).classList.remove('active');
+  cur = q + 1;
+  document.getElementById('s' + cur).classList.add('active');
+  document.getElementById('prog').style.width = (cur / 4 * 100) + '%';
+  window.scrollTo(0, 0);
+}
+
+function backTo(q) {
+  document.getElementById('s' + q).classList.remove('active');
+  cur = q - 1;
+  document.getElementById('s' + cur).classList.add('active');
+  document.getElementById('prog').style.width = (cur / 4 * 100) + '%';
+  window.scrollTo(0, 0);
+}
+
+function showResult() {
+  var mbti = ans[0] + ans[1] + ans[2] + ans[3];
+  var g;
+  if (ans[1] === 'N' && ans[2] === 'F') g = 'NF';
+  else if (ans[1] === 'N' && ans[2] === 'T') g = 'NT';
+  else if (ans[1] === 'S' && ans[3] === 'P') g = 'SP';
+  else g = 'SJ';
+
+  var r = SCENTS[MBTI_SCENT[g]];
+  document.getElementById('rIcon').textContent = r.icon;
+  document.getElementById('rName').textContent = r.name;
+  document.getElementById('rEn').textContent = r.en;
+  document.getElementById('rType').textContent = mbti;
+  document.getElementById('rTypeSub').textContent = r.group + ' 型人格';
+  document.getElementById('rQuote').textContent = r.quote;
+  document.getElementById('rDesc').textContent = r.desc;
+  document.getElementById('rNote').textContent = r.note;
+  document.getElementById('rCta').textContent = r.cta;
+
+  var html = '';
+  [ans[0], ans[1], ans[2], ans[3]].forEach(function(l) {
+    html += '<span class="lpill hi">' + LABELS[l] + '</span>';
+    html += '<span class="lpill">' + LABELS[OPP[l]] + '</span>';
+  });
+  document.getElementById('rLetters').innerHTML = html;
+
+  document.getElementById('quizWrap').style.display = 'none';
+  document.getElementById('resultWrap').classList.add('show');
+  document.getElementById('prog').style.width = '100%';
+  window.scrollTo(0, 0);
+}
+
+function retry() {
+  ans = {};
+  cur = 0;
+  document.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('sel'); });
+  for (var i = 0; i < 4; i++) { document.getElementById('n' + i).disabled = true; }
+  document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('s0').classList.add('active');
+  document.getElementById('quizWrap').style.display = 'block';
+  document.getElementById('resultWrap').classList.remove('show');
+  document.getElementById('prog').style.width = '0%';
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
