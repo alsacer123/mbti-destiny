@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>今日脉轮诊断 · PocketNature</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--t:#1A1A18;--t2:#6B6B65;--t3:#A8A8A0;--bg:#FAFAF8;--sur:#fff;--bd:rgba(26,26,24,0.1);--bd2:rgba(26,26,24,0.22);--r:14px}
+html,body{background:var(--bg);font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;color:var(--t);-webkit-font-smoothing:antialiased}
+
+.wrap{max-width:420px;margin:0 auto;padding:28px 20px 56px}
+.brand{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:14px}
+.prog-track{height:2px;background:var(--bd);border-radius:2px;overflow:hidden;margin-bottom:32px}
+.prog-fill{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1),background .4s}
+
+.step{display:none}
+.step.active{display:block}
+
+.q-dim{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:10px}
+.q-txt{font-size:20px;font-weight:600;line-height:1.4;letter-spacing:-.3px;margin-bottom:5px;color:var(--t)}
+.q-sub{font-size:13px;color:var(--t3);margin-bottom:24px;line-height:1.6}
+
+.opts{display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:15px;border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;background:var(--sur);transition:border-color .12s;-webkit-user-select:none;user-select:none}
+.opt:active{transform:scale(.985)}
+.opt.sel{border:1.5px solid var(--t)}
+.chakra-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;margin-top:2px;opacity:.7;transition:opacity .12s}
+.opt.sel .chakra-dot{opacity:1}
+.opt-main{font-size:15px;font-weight:500;color:var(--t);line-height:1.4;margin-bottom:3px}
+.opt-sub-txt{font-size:12px;color:var(--t3);line-height:1.5}
+
+.nav{display:flex;gap:8px;align-items:center}
+.btn-back{width:46px;height:46px;border-radius:50%;border:1px solid var(--bd);background:var(--sur);font-size:17px;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-back:active{background:var(--bd)}
+.btn-next{flex:1;height:50px;border-radius:var(--r);border:none;background:var(--t);color:#fff;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.02em;transition:opacity .15s,transform .1s}
+.btn-next:active{transform:scale(.98)}
+.btn-next:disabled{opacity:.22;cursor:default}
+.btn-next:disabled:active{transform:none}
+
+/* 结果页 */
+.result{display:none;max-width:420px;margin:0 auto;padding:0 0 56px}
+.result.show{display:block}
+
+.res-hero{padding:48px 20px 36px;text-align:center}
+.res-brand{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:24px}
+.chakra-ring{width:76px;height:76px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:30px;transition:background .3s,border-color .3s}
+.res-chakra-label{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:5px}
+.res-chakra-name{font-size:14px;font-weight:500;color:var(--t2);margin-bottom:18px}
+.res-scent-name{font-size:30px;font-weight:700;letter-spacing:-.5px;color:var(--t);margin-bottom:4px}
+.res-scent-en{font-size:12px;color:var(--t3);letter-spacing:.04em;margin-bottom:22px}
+.res-quote{font-size:14px;color:var(--t2);line-height:1.8;font-style:italic;max-width:300px;margin:0 auto}
+
+.res-body{padding:0 20px}
+.divider{height:.5px;background:var(--bd);margin:24px 0}
+.slabel{font-size:11px;letter-spacing:.1em;color:var(--t3);margin-bottom:10px}
+
+.energy-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.energy-tag{font-size:12px;padding:5px 12px;border:1px solid var(--bd);border-radius:16px;color:var(--t2);background:var(--sur)}
+
+.diag-block{padding:16px;border-radius:var(--r);margin-bottom:0}
+.diag-label{font-size:11px;letter-spacing:.08em;margin-bottom:7px;font-weight:600}
+.diag-text{font-size:13px;line-height:1.8;color:var(--t2)}
+
+.chakra-block{border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:16px;background:var(--sur)}
+.chakra-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.chakra-pip{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.chakra-title{font-size:14px;font-weight:600;color:var(--t)}
+.chakra-desc{font-size:13px;color:var(--t2);line-height:1.75}
+
+.scent-card{border:1px solid var(--bd2);border-radius:var(--r);padding:17px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;background:var(--sur)}
+.sc-sub{font-size:11px;color:var(--t3);margin-bottom:3px;letter-spacing:.04em}
+.sc-title{font-size:15px;font-weight:600;color:var(--t);margin-bottom:3px}
+.sc-tag{font-size:12px;color:var(--t3)}
+.retry{width:100%;padding:13px;border:1px solid var(--bd);border-radius:10px;background:transparent;font-size:13px;color:var(--t3);cursor:pointer;margin-top:4px}
+.retry:active{background:var(--bd)}
+.hint{text-align:center;font-size:12px;color:var(--t3);margin-top:13px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="quizWrap">
+  <div class="brand">POCKETNATURE · 今日脉轮诊断</div>
+  <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%;background:#888"></div></div>
+
+  <!-- Q1 -->
+  <div class="step active" id="s0">
+    <div class="q-dim">身体感知 · 01 / 03</div>
+    <div class="q-txt">闭上眼睛，感受一下——此刻身体哪个部位最沉？</div>
+    <div class="q-sub">不用分析，第一个浮现的感觉</div>
+    <div class="opts" id="opts0">
+      <div class="opt" data-v="lavender">
+        <div class="chakra-dot" style="background:#9B8EC4"></div>
+        <div class="opt-body">
+          <div class="opt-main">胸口以上，头很满</div>
+          <div class="opt-sub-txt">思绪太多，像装不下了</div>
+        </div>
+      </div>
+      <div class="opt" data-v="mint">
+        <div class="chakra-dot" style="background:#6BBF8E"></div>
+        <div class="opt-body">
+          <div class="opt-main">胸口中央，有点压</div>
+          <div class="opt-sub-txt">有什么憋在那里，出不来</div>
+        </div>
+      </div>
+      <div class="opt" data-v="lemon">
+        <div class="chakra-dot" style="background:#F5C842"></div>
+        <div class="opt-body">
+          <div class="opt-main">腹部中段，空空的</div>
+          <div class="opt-sub-txt">提不起力气，像被掏空了</div>
+        </div>
+      </div>
+      <div class="opt" data-v="sweet">
+        <div class="chakra-dot" style="background:#F4A460"></div>
+        <div class="opt-body">
+          <div class="opt-main">小腹以下，没有根</div>
+          <div class="opt-sub-txt">飘着，找不到落地感</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav"><button class="btn-next" id="n0" disabled>继续</button></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="step" id="s1">
+    <div class="q-dim">情绪感知 · 02 / 03</div>
+    <div class="q-txt">不用分析，第一感觉——今天你的情绪更像？</div>
+    <div class="q-sub">哪个词第一个击中你</div>
+    <div class="opts" id="opts1">
+      <div class="opt" data-v="lavender">
+        <div class="chakra-dot" style="background:#9B8EC4"></div>
+        <div class="opt-body">
+          <div class="opt-main">散的，飘，抓不住重心</div>
+          <div class="opt-sub-txt">需要一个让自己沉下来的东西</div>
+        </div>
+      </div>
+      <div class="opt" data-v="mint">
+        <div class="chakra-dot" style="background:#6BBF8E"></div>
+        <div class="opt-body">
+          <div class="opt-main">堵的，憋，有话说不出</div>
+          <div class="opt-sub-txt">某个地方卡住了，需要被冲开</div>
+        </div>
+      </div>
+      <div class="opt" data-v="lemon">
+        <div class="chakra-dot" style="background:#F5C842"></div>
+        <div class="opt-body">
+          <div class="opt-main">乱的，燥，思路打结</div>
+          <div class="opt-sub-txt">需要一个清醒的锚点</div>
+        </div>
+      </div>
+      <div class="opt" data-v="sweet">
+        <div class="chakra-dot" style="background:#F4A460"></div>
+        <div class="opt-body">
+          <div class="opt-main">空的，软，提不起劲</div>
+          <div class="opt-sub-txt">需要一点暖，从里面填回来</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" id="b1">←</button>
+      <button class="btn-next" id="n1" disabled>继续</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="step" id="s2">
+    <div class="q-dim">意志感知 · 03 / 03</div>
+    <div class="q-txt">如果可以，你今天最想要——</div>
+    <div class="q-sub">最后一题，选完立刻出结果</div>
+    <div class="opts" id="opts2">
+      <div class="opt" data-v="lavender">
+        <div class="chakra-dot" style="background:#9B8EC4"></div>
+        <div class="opt-body">
+          <div class="opt-main">彻底放空，什么都不想</div>
+          <div class="opt-sub-txt">灵魂充电，不是睡觉，是真正的放下</div>
+        </div>
+      </div>
+      <div class="opt" data-v="mint">
+        <div class="chakra-dot" style="background:#6BBF8E"></div>
+        <div class="opt-body">
+          <div class="opt-main">冲破某件事，动起来</div>
+          <div class="opt-sub-txt">那口气一直憋着，今天想用上</div>
+        </div>
+      </div>
+      <div class="opt" data-v="lemon">
+        <div class="chakra-dot" style="background:#F5C842"></div>
+        <div class="opt-body">
+          <div class="opt-main">想清楚，理出一条线</div>
+          <div class="opt-sub-txt">混沌不是常态，需要重新清醒</div>
+        </div>
+      </div>
+      <div class="opt" data-v="sweet">
+        <div class="chakra-dot" style="background:#F4A460"></div>
+        <div class="opt-body">
+          <div class="opt-main">被好好接住，不用撑</div>
+          <div class="opt-sub-txt">给出去太多了，今天想被填满</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" id="b2">←</button>
+      <button class="btn-next" id="n2" disabled>查看我的今日脉轮 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- 结果页 -->
+<div class="result" id="resultWrap">
+  <div class="res-hero">
+    <div class="res-brand">POCKETNATURE · 今日脉轮诊断</div>
+    <div class="chakra-ring" id="rRing"></div>
+    <div class="res-chakra-label">今日激活脉轮</div>
+    <div class="res-chakra-name" id="rChakraName"></div>
+    <div class="res-scent-name" id="rName"></div>
+    <div class="res-scent-en" id="rEn"></div>
+    <div class="res-quote" id="rQuote"></div>
+  </div>
+
+  <div class="res-body">
+    <div class="slabel">今日能量标签</div>
+    <div class="energy-row" id="rTags"></div>
+
+    <div class="diag-block" id="rDiagBlock">
+      <div class="diag-label" id="rDiagLabel">今日脉轮诊断</div>
+      <div class="diag-text" id="rDiag"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="slabel">脉轮体系</div>
+    <div class="chakra-block">
+      <div class="chakra-row">
+        <div class="chakra-pip" id="rPip"></div>
+        <div class="chakra-title" id="rChakraTitle"></div>
+      </div>
+      <div class="chakra-desc" id="rChakraDesc"></div>
+    </div>
+
+    <div class="slabel">今日玄学加持</div>
+    <div class="diag-block" id="rMagicBlock" style="margin-bottom:20px">
+      <div class="diag-text" id="rMagic"></div>
+    </div>
+
+    <div class="slabel" style="margin-bottom:10px">你的今日精油</div>
+    <div class="scent-card">
+      <div>
+        <div class="sc-sub">PocketNature 天然精油</div>
+        <div class="sc-title" id="rCta"></div>
+        <div class="sc-tag">原产地直采 · 封闭系统专属</div>
+      </div>
+      <div style="font-size:18px;color:var(--t3)">→</div>
+    </div>
+    <button class="retry" id="retryBtn">重新诊断</button>
+    <div class="hint">长按截图，分享给朋友测一测</div>
+  </div>
+</div>
+
+<script>
+var DATA = {
+  lavender: {
+    color:'#9B8EC4', bgColor:'rgba(155,142,196,0.1)', fgColor:'#6B5BA8',
+    chakraName:'顶轮 · 眉心轮',
+    chakraTitle:'顶轮 Sahasrara · 眉心轮 Ajna',
+    chakraDesc:'掌管直觉、智慧与精神连接。当顶轮失衡，思绪会过度活跃，难以落地；当眉心轮失衡，直觉被噪声覆盖，你感知不到内心真正的声音。',
+    name:'山野息声', en:'Lavender · 普罗旺斯原产地',
+    quote:'「你从来不是真的平静，你只是学会了把风暴藏得很深。薰衣草懂你。」',
+    tags:['高频镇静波','直觉修复','深度放空','灵魂充电'],
+    diag:'你今天的能量在向上涌，脑区过载，顶轮与眉心轮的通道被堵住了。这不是你太脆弱，是你感知力太强——你接收了太多，却没有出口。薰衣草的芳樟醇分子能抑制交感神经过度放电，引导脑波向Alpha波转移。用香气替你清一次场。',
+    magic:'薰衣草的紫色在西方神秘学中对应"第三眼"脉轮，睡前闻薰衣草，能打开通往直觉的门。爱的魔法、调和关系——当你身上的磁场变得像薰衣草田一样宁静辽阔，对的人自然会驻足停留。',
+    icon:'🌿', cta:'薰衣草精油 · 蒸汽蒸馏'
+  },
+  mint: {
+    color:'#6BBF8E', bgColor:'rgba(107,191,142,0.1)', fgColor:'#3A8F5E',
+    chakraName:'心轮',
+    chakraTitle:'心轮 Anahata',
+    chakraDesc:'掌管爱、宽恕与自我接纳。当心轮受阻，你会感到胸口有什么东西卡住，情绪流动被切断，行动力也随之被压制——那口气一直憋着，出不来。',
+    name:'破风入境', en:'Peppermint · 云南原产地',
+    quote:'「你早就准备好了。差的不是能力，是那口冲破边界的气。吸一口，动起来。」',
+    tags:['空间净化器','心轮疏通','行动力激活','突破瓶颈'],
+    diag:'你今天的心轮在收缩，能量被堵在胸腔出不来。不是没有力气，是那股力气找不到出口。薄荷醇激活三叉神经，强制将脑波从昏沉拉回高频警觉。那股穿透感，就是帮你把堵住的地方冲开的钥匙。',
+    magic:'净化呼吸、招引财气——大自然中薄荷因生命力顽强，被视为能激活气场、招引财气的吉祥植物。"嗅觉版的心灵卸妆"——薄荷的通透感强行撑开闭塞的感官，把一天沾染的负面信息统统洗刷干净。留给夜晚的，只有纯粹的自我。',
+    icon:'❄️', cta:'薄荷精油 · 蒸汽蒸馏'
+  },
+  lemon: {
+    color:'#E8B800', bgColor:'rgba(232,184,0,0.08)', fgColor:'#8A6C00',
+    chakraName:'太阳神经丛',
+    chakraTitle:'太阳神经丛 Manipura',
+    chakraDesc:'掌管个人力量、意志力与逻辑思维。当太阳神经丛失衡，你会感到腹部空洞、决断力下降，思路明明有，却像隔了一层雾，怎么都理不清。',
+    name:'清醒时刻', en:'Lemon · 西西里岛原产地',
+    quote:'「混沌不是你的常态，你本来就是那个看得清的人。柠檬替你把思路的雾散开。」',
+    tags:['太阳能量','逻辑激活','意志力修复','决断力'],
+    diag:'你今天的太阳神经丛能量在耗散，脑内有大量代谢废物堆积，造成了那种"知道要做但动不了"的堵感。柠檬烯能诱导谷胱甘肽活性，清除让身体感觉沉重的代谢负债。那股酸香，就是替你启动深层排毒的开关。',
+    magic:'情绪提振与正能量——柠檬的黄是太阳的颜色，在玄学中被视为阳性力量的化身，能驱散阴霾、激活停滞的气场。出门前吸一口，讨个"柠"静顺利的彩头。重要会议、面试、谈判前，让柠檬的明亮气息给你撑腰。',
+    icon:'🍋', cta:'柠檬精油 · 冷压萃取'
+  },
+  sweet: {
+    color:'#E8843A', bgColor:'rgba(232,132,58,0.08)', fgColor:'#A05010',
+    chakraName:'脐轮',
+    chakraTitle:'脐轮 Svadhisthana',
+    chakraDesc:'掌管情绪流动、亲密关系与创造灵感。当脐轮失衡，你会感到情感上的匮乏与失重——不是真的空了，是给出去太多，却没有人在给你充电。',
+    name:'暖意橙光', en:'Sweet Orange · 西班牙原产地',
+    quote:'「你不是不够强，你只是太久没被好好对待了。橙的甜，替你说那句还没说出口的话。」',
+    tags:['脐轮修复','太阳能量','甜美磁场','情绪流动'],
+    diag:'你今天的脐轮在漏能。不是你软弱，是你一直在输出、在照顾、在撑着，却没有人托住你。甜橙的分子运动轨迹是横向铺开的，激活大脑奖赏回路，唤起最简单的快乐。那种暖，是从里往外填回来的。',
+    magic:'太阳能量、金色暖阳——把你的频率调到和太阳同步，让甜橙替你光合作用。甜美磁场、嗅觉吸引力——同频相吸，当你浑身散发着"我很好、我很满足"的气息时，好事自然会找上门。',
+    icon:'🍊', cta:'甜橙精油 · 冷压萃取'
+  }
+};
+
+var ans = {};
+
+function initOpts() {
+  for (var q = 0; q < 3; q++) {
+    (function(qi) {
+      document.querySelectorAll('#opts'+qi+' .opt').forEach(function(opt) {
+        opt.addEventListener('click', function() {
+          document.querySelectorAll('#opts'+qi+' .opt').forEach(function(o){ o.classList.remove('sel'); });
+          this.classList.add('sel');
+          ans[qi] = this.getAttribute('data-v');
+          document.getElementById('n'+qi).disabled = false;
+        });
+      });
+    })(q);
+  }
+  document.getElementById('n0').addEventListener('click', function(){ goTo(0); });
+  document.getElementById('n1').addEventListener('click', function(){ goTo(1); });
+  document.getElementById('n2').addEventListener('click', function(){ showResult(); });
+  document.getElementById('b1').addEventListener('click', function(){ backTo(1); });
+  document.getElementById('b2').addEventListener('click', function(){ backTo(2); });
+  document.getElementById('retryBtn').addEventListener('click', retry);
+}
+
+function goTo(q) {
+  document.getElementById('s'+q).classList.remove('active');
+  var next = q + 1;
+  document.getElementById('s'+next).classList.add('active');
+  document.getElementById('prog').style.width = ((next/3)*100) + '%';
+  window.scrollTo(0,0);
+}
+
+function backTo(q) {
+  document.getElementById('s'+q).classList.remove('active');
+  var prev = q - 1;
+  document.getElementById('s'+prev).classList.add('active');
+  document.getElementById('prog').style.width = ((prev/3)*100) + '%';
+  window.scrollTo(0,0);
+}
+
+function showResult() {
+  var scores = { lavender:0, mint:0, lemon:0, sweet:0 };
+  scores[ans[0]] += 1;
+  scores[ans[1]] += 1;
+  scores[ans[2]] += 2;
+  var winner = Object.keys(scores).reduce(function(a,b){ return scores[a] >= scores[b] ? a : b; });
+  var d = DATA[winner];
+
+  document.getElementById('prog').style.width = '100%';
+  document.getElementById('prog').style.background = d.color;
+
+  var ring = document.getElementById('rRing');
+  ring.style.background = d.bgColor;
+  ring.style.border = '2px solid ' + d.color;
+  ring.textContent = d.icon;
+
+  document.getElementById('rChakraName').textContent = d.chakraName;
+  document.getElementById('rName').textContent = d.name;
+  document.getElementById('rEn').textContent = d.en;
+  document.getElementById('rQuote').textContent = d.quote;
+
+  document.getElementById('rTags').innerHTML = d.tags.map(function(t){
+    return '<span class="energy-tag">'+t+'</span>';
+  }).join('');
+
+  var diagBlock = document.getElementById('rDiagBlock');
+  diagBlock.style.background = d.bgColor;
+  diagBlock.style.borderRadius = '12px';
+  diagBlock.style.padding = '16px';
+  document.getElementById('rDiagLabel').style.color = d.fgColor;
+  document.getElementById('rDiag').textContent = d.diag;
+
+  document.getElementById('rPip').style.background = d.color;
+  document.getElementById('rChakraTitle').textContent = d.chakraTitle;
+  document.getElementById('rChakraDesc').textContent = d.chakraDesc;
+
+  var magicBlock = document.getElementById('rMagicBlock');
+  magicBlock.style.background = d.bgColor;
+  magicBlock.style.borderRadius = '12px';
+  magicBlock.style.padding = '16px';
+  document.getElementById('rMagic').textContent = d.magic;
+
+  document.getElementById('rCta').textContent = d.cta;
+
+  document.getElementById('quizWrap').style.display = 'none';
+  document.getElementById('resultWrap').classList.add('show');
+  window.scrollTo(0,0);
+}
+
+function retry() {
+  ans = {};
+  document.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('sel'); });
+  ['n0','n1','n2'].forEach(function(id){ document.getElementById(id).disabled = true; });
+  document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('s0').classList.add('active');
+  document.getElementById('quizWrap').style.display = 'block';
+  document.getElementById('resultWrap').classList.remove('show');
+  document.getElementById('prog').style.width = '0%';
+  document.getElementById('prog').style.background = '#888';
+  window.scrollTo(0,0);
+}
+
+initOpts();
+</script>
+</body>
+</html>
